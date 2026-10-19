@@ -66,6 +66,13 @@ public final class PupilShape {
         return planes(b,progress,width,height,0,0);
     }
     public static float[] planes(LensBounds b,float progress,int width,int height,float shiftX,float shiftY) {
+        return planes(b,progress,width,height,shiftX,shiftY,true);
+    }
+    /** Physical aperture-sized gate: never expand it to compensate for sway. */
+    public static float[] eyePlanes(LensBounds b,float progress,int width,int height,float shiftX,float shiftY) {
+        return planes(b,progress,width,height,shiftX,shiftY,false);
+    }
+    private static float[] planes(LensBounds b,float progress,int width,int height,float shiftX,float shiftY,boolean expand) {
         if (b == null || !b.valid() || b.outline().length < 6 || !Float.isFinite(progress)) return new float[0];
         float[] vertices = b.outline(), planes = new float[vertices.length/2*4];
         // The bounding-box center can lie outside a perspective-skewed aperture.
@@ -74,6 +81,9 @@ public final class PupilShape {
         double centerX=0,centerY=0;
         for(int i=0;i<vertices.length;i+=2){centerX+=vertices[i];centerY+=vertices[i+1];}
         centerX/=vertices.length/2;centerY/=vertices.length/2;
+        if(!expand&&b.eye()!=null&&b.eye().visible()&&b.eye().finite()) {
+            centerX=b.eye().centerX();centerY=b.eye().centerY();
+        }
         double p = Math.max(0, Math.min(1, progress));
         double t = Math.max(0, Math.min(1, (p-.85)/.13));
         t = t*t*(3-2*t);
@@ -91,9 +101,10 @@ public final class PupilShape {
             // dropping the ADS gate. Otherwise removed hull vertices can pop in.
             double full=Math.max(1,(Math.abs(nx*offsetX+ny*offsetY)
                     +Math.abs(nx)*b.rx()*width+Math.abs(ny)*b.ry()*height+2)/(-c));
-            double scale=p+(full-p)*t;
+            double scale=expand ? p+(full-p)*t : p;
             planes[i*4]=(float)nx; planes[i*4+1]=(float)ny;
-            planes[i*4+2]=(float)(c*scale+nx*shiftX+ny*shiftY);
+            // Two pixels cover numerical/hull edge differences without swallowing sway.
+            planes[i*4+2]=(float)(c*scale+nx*shiftX+ny*shiftY-(expand ? 0 : 2*p));
         }
         return planes;
     }

@@ -16,5 +16,5 @@ foreach ($entry in [regex]::Matches($source, '(?s)\b(\w+)\s*=\s*builder\.((?:"[^
     if ($suffix -ne "`nRange: 0.0 ~ 0.6") { throw 'Incorrect range suffix' }
     $count++
 }
-if ($count -ne 9) { throw "Expected nine numeric settings, found $count" }
+if ($count -ne 21) { throw "Expected twenty-one numeric settings, found $count" }
 Write-Output "Configured comment regression: old failure reproduced; all $count numeric definitions passed. (Static check, not GUI test.)"

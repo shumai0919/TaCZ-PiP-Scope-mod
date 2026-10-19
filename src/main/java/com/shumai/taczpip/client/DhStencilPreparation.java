@@ -1,7 +1,6 @@
 package com.shumai.taczpip.client;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.ModList;
 import org.lwjgl.opengl.GL11;
@@ -32,7 +31,5 @@ public final class DhStencilPreparation {
             GlStateManager._glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER,
                     draw == previousMain ? target.frameBufferId : draw);
         }
-        LogUtils.getLogger().info("[TaCZ PiP Scope] DH main depth/stencil prepared before frame: {}x{}",
-                target.width, target.height);
     }
 }

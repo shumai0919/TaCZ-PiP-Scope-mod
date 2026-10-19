@@ -37,9 +37,31 @@ public abstract class BedrockAttachmentModelMixin implements OpticalModel {
     @Unique private double[] taczpip$lensX = new double[0];
     @Unique private double[] taczpip$lensY = new double[0];
     @Unique private boolean[] taczpip$opticalFlags = new boolean[0];
+    @Unique private Boolean taczpip$nativeHud;
+
+    @Override
+    public boolean taczpip$nativeHud() {
+        if(taczpip$nativeHud!=null) return taczpip$nativeHud;
+        boolean found=false;
+        if(isScope()) for(int i=0;i<ocularNodePaths.size() && i<127;i++) {
+            if(!LensStencilRules.optical(isSight(),isScopeOcular,i)) continue;
+            var path=ocularNodePaths.get(i);
+            if(path.isEmpty()) continue;
+            var root=path.get(path.size()-1);
+            // Empty anchor with exclusively emissive child geometry is a HUD,
+            // not a physical aperture. Fall back for the whole attachment to
+            // avoid mixing native and promoted stencil indices in hybrid models.
+            if(root.cubes.isEmpty() && !root.children.isEmpty() &&
+                    com.shumai.taczpip.client.HudOpticRules.emissiveOnly(root,
+                            p->p.children,p->!p.cubes.isEmpty(),p->p.illuminated)) found=true;
+        }
+        taczpip$nativeHud=found;
+        return found;
+    }
 
     @Override
     public boolean taczpip$isOpticalView(int view) {
+        if(taczpip$nativeHud()) return false;
         if (!isSight()) return taczpip$hasOpticalLens();
         var eye = getScopeViewPath(view);
         if (eye == null || eye.isEmpty()) return false;
@@ -66,7 +88,7 @@ public abstract class BedrockAttachmentModelMixin implements OpticalModel {
     }
     @Override
     public boolean taczpip$hasOpticalLens() {
-        if (!isScope()) return false;
+        if (!isScope() || taczpip$nativeHud()) return false;
         for (int i = 0; i < ocularNodePaths.size() && i < 127; i++) {
             if (LensStencilRules.optical(isSight(), isScopeOcular, i)) return true;
         }
@@ -99,6 +121,7 @@ public abstract class BedrockAttachmentModelMixin implements OpticalModel {
                         mc.getWindow().getWidth(), mc.getWindow().getHeight());
             }
             ScopeLensComposite.setEyeBox(eyes);
+            ScopeLensComposite.setAimingProgress(progress);
             ScopeLensComposite.setLensBounds(bounds);
             ScopeLensComposite.draw(indices);
             if (PrototypeConfig.DEBUG_LENS_MASK.get()) { ci.cancel(); return; }

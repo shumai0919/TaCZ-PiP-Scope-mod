@@ -82,7 +82,7 @@ public final class GpuRenderMetrics {
     @SubscribeEvent
     public static void frame(TickEvent.RenderTickEvent event) {
         var mc=Minecraft.getInstance();
-        boolean smoke=Boolean.getBoolean("taczpip.renderChecks") && !smokeDone && mc.level==null;
+        boolean smoke=!net.minecraftforge.fml.loading.FMLEnvironment.production && Boolean.getBoolean("taczpip.renderChecks") && !smokeDone && mc.level==null;
         boolean enabled=PrototypeConfig.GPU_METRICS.get() && mc.level!=null && mc.screen==null;
         if(event.phase==TickEvent.Phase.START) {
             if(!enabled && !smoke) { if(initialized) release(); return; }

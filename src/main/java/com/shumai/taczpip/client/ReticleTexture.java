@@ -141,7 +141,7 @@ public final class ReticleTexture {
         float u0=Float.POSITIVE_INFINITY,v0=u0,u1=Float.NEGATIVE_INFINITY,v1=u1; int count;
         public VertexConsumer vertex(double x,double y,double z){xyz[count*3]=x;xyz[count*3+1]=y;xyz[count*3+2]=z;return this;}
         public VertexConsumer uv(float u,float v){u0=Math.min(u0,u);v0=Math.min(v0,v);u1=Math.max(u1,u);v1=Math.max(v1,v);return this;}
-        public void endVertex(){if(++count==4){faces.add(new Face(owner,cube,new float[]{u0,v0,u1,v1},xyz));xyz=new double[12];count=0;u0=v0=Float.POSITIVE_INFINITY;u1=v1=Float.NEGATIVE_INFINITY;}}
+        public void endVertex(){if(++count==4){if(QuadGeometry.hasArea(xyz))faces.add(new Face(owner,cube,new float[]{u0,v0,u1,v1},xyz));xyz=new double[12];count=0;u0=v0=Float.POSITIVE_INFINITY;u1=v1=Float.NEGATIVE_INFINITY;}}
         public VertexConsumer color(int r,int g,int b,int a){return this;}
         public VertexConsumer overlayCoords(int u,int v){return this;}
         public VertexConsumer uv2(int u,int v){return this;}

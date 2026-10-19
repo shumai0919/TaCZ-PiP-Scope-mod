@@ -3,6 +3,6 @@
   "minVersion": "0.8",
   "package": "com.shumai.taczpip.mixin",
   "compatibilityLevel": "JAVA_17",
-  "client": ["CubeVertexReuseMixin", "BedrockModelProfileMixin", "BedrockAttachmentModelMixin", "CameraSetupEventMixin", "FirstPersonPositionMixin", "BedrockGunModelMixin", "EmbeddiumWorldRendererMixin", "ShaderWorldStartMixin", "OculusHandMixin", "OculusChunkProgramsMixin", "OculusPipelineLifecycleMixin", "OculusFinalCompositeMixin", "DhClientApiMixin", "DhStencilPreparationMixin", "ScopeEntityFilterMixin", "ScopeBlockEntityFilterMixin", "ScopeParticleFilterMixin", "ScopeWindowSizeMixin", "DhScopeBuffersMixin", "GpuShiftScopeEntityMixin", "GpuShiftScopeBudgetMixin"],
+  "client": ["ConfiguredOrderMixin", "CubeVertexReuseMixin", "BedrockModelProfileMixin", "BedrockAttachmentModelMixin", "CameraSetupEventMixin", "FirstPersonPositionMixin", "BedrockGunModelMixin", "EmbeddiumWorldRendererMixin", "ShaderWorldStartMixin", "OculusHandMixin", "OculusChunkProgramsMixin", "OculusPipelineLifecycleMixin", "OculusFinalCompositeMixin", "DhStencilPreparationMixin", "ScopeEntityFilterMixin", "ScopeBlockEntityFilterMixin", "ScopeParticleFilterMixin", "ScopeWindowSizeMixin", "DhScopeBuffersMixin", "GpuShiftScopeEntityMixin", "GpuShiftScopeBudgetMixin"],
   "injectors": {"defaultRequire": 1}
 }

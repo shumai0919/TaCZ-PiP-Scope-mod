@@ -39,6 +39,16 @@ public final class OpticsPolicy {
                 .map(index -> index.isScope() && index.getAttachmentModel() instanceof OpticalModel model
                         && model.taczpip$hasOpticalLens()).orElse(false);
     }
+    public static boolean useNativeHud() {
+        if(!isLocalGun()) return false;
+        var stack=KeepingItemRenderer.getRenderer().getCurrentItem();
+        var gun=IGun.getIGunOrNull(stack);
+        var id=gun.getAttachmentId(stack,AttachmentType.SCOPE);
+        if(DefaultAssets.isEmptyAttachmentId(id)) id=gun.getBuiltInAttachmentId(stack,AttachmentType.SCOPE);
+        return TimelessAPI.getClientAttachmentIndex(id)
+                .map(index->index.getAttachmentModel() instanceof OpticalModel model && model.taczpip$nativeHud())
+                .orElse(false);
+    }
     public static boolean isOpticalViewSelected() {
         if (!isLocalGun()) return false;
         var stack = KeepingItemRenderer.getRenderer().getCurrentItem();

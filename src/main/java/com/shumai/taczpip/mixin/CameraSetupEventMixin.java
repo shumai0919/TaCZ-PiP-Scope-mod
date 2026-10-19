@@ -19,7 +19,7 @@ public abstract class CameraSetupEventMixin {
         var mc = Minecraft.getInstance();
         // Empty hand and rendered/held item transitions must take the same path.
         // TaCZ's asynchronous dynamics otherwise resumes from an obsolete target.
-        if (FovRules.bypass(PrototypeConfig.ENABLED.get(), event.usedConfiguredFov(),
+        if (FovRules.bypass(PrototypeConfig.ENABLED.get() && !OpticsPolicy.useNativeHud(), event.usedConfiguredFov(),
                 mc.options.getCameraType().isFirstPerson(),
                 mc.player != null && event.getCamera().getEntity() == mc.player)) ci.cancel();
     }

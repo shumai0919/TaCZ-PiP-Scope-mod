@@ -1,6 +1,5 @@
 package com.shumai.taczpip.client;
 
-import com.mojang.logging.LogUtils;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -44,7 +43,6 @@ public final class ShaderScopeContext implements AutoCloseable {
             if (scopeManager == null) {
                 Object factory = field(main.getClass(), "pipelineFactory").get(main);
                 scopeManager = main.getClass().getConstructor(java.util.function.Function.class).newInstance(factory);
-                LogUtils.getLogger().info("[TaCZ PiP Scope] Created independent Oculus scope pipeline manager");
             }
             managerField.set(null, scopeManager);
             active = true;

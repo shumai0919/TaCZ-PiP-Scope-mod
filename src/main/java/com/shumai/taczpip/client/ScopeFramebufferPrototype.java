@@ -35,7 +35,6 @@ public final class ScopeFramebufferPrototype {
     private static final PoseStack SAVED_WORLD_VIEW = new PoseStack();
     private static boolean rendering, ready, failed, warned;
     private static float magnification;
-    private static long frameCount;
     private static final ZoomTransition ZOOM_TRANSITION = new ZoomTransition();
     private static String zoomContext;
     private static boolean cached;
@@ -104,7 +103,7 @@ public final class ScopeFramebufferPrototype {
         ready = false;
         ScopeLensComposite.clearReticle();
         Minecraft mc = Minecraft.getInstance();
-        boolean force = Boolean.getBoolean("taczpip.shaderWorldChecks")
+        boolean force = !net.minecraftforge.fml.loading.FMLEnvironment.production && Boolean.getBoolean("taczpip.shaderWorldChecks")
                 && !Boolean.getBoolean("taczpip.shaderAdsChecks");
         if (failed || !PrototypeConfig.FRAMEBUFFER.get() || !PrototypeConfig.ENABLED.get()
                 || mc.player == null || mc.level == null || mc.screen != null
@@ -179,7 +178,6 @@ public final class ScopeFramebufferPrototype {
             // Fabulous auxiliary targets remain unsupported (see compatibleRenderer).
             if (target == null) {
                 target = new TextureTarget(width, height, true, Minecraft.ON_OSX);
-                LogUtils.getLogger().info("[TaCZ PiP Scope] Phase 5 framebuffer created: {}x{}", main.width, main.height);
             } else if (target.width != width || target.height != height) {
                 // Oculus' normal resize path does not rebuild every DH attachment
                 // and shader history target. Destroy the scope pipeline BEFORE its
@@ -206,10 +204,9 @@ public final class ScopeFramebufferPrototype {
             ready = true;
             cached = true;
             lastWorldTime = now;
-            if (++frameCount == 1) LogUtils.getLogger().info("[TaCZ PiP Scope] Phase 5 first world frame rendered ({}x)", zoom);
         } catch (RuntimeException exception) {
             failed = true;
-            LogUtils.getLogger().error("[TaCZ PiP Scope] Phase 5 disabled until reconnect after render failure", exception);
+            LogUtils.getLogger().error("[TaCZ PiP Scope] PiP disabled until reconnect after render failure", exception);
         } finally {
             mc.mainRenderTarget = main;
             mc.levelRenderer.entityEffect = outlines;
@@ -269,7 +266,6 @@ public final class ScopeFramebufferPrototype {
         worldView = null;
         cacheLevel = null;
         cacheSettings = null;
-        frameCount = 0;
         if (target != null) {
             target.destroyBuffers();
             target = null;

@@ -19,6 +19,7 @@ public final class EyeBoxMeasure implements VertexConsumer {
     private final java.util.ArrayList<double[]> points = new java.util.ArrayList<>();
     private net.minecraft.resources.ResourceLocation texture;
     private final Vector4f[] quad = new Vector4f[4];
+    private final double[] viewQuad=new double[12];
     private final float[] uv = new float[8];
     private int vertexIndex;
     private boolean alphaShaped;
@@ -104,21 +105,42 @@ public final class EyeBoxMeasure implements VertexConsumer {
         return new LensBounds((float)((measure.minX + measure.maxX) / 4 + .5),
                 (float)((measure.minY + measure.maxY) / 4 + .5),
                 (float)((measure.maxX - measure.minX) / 4),
-                (float)((measure.maxY - measure.minY) / 4), PupilShape.hull(measure.points), measure.alphaShaped,facing,tiltX,tiltY);
+                (float)((measure.maxY - measure.minY) / 4), PupilShape.hull(measure.points), measure.alphaShaped,facing,tiltX,tiltY,
+                measure.eyeProjection(plane,normal));
+    }
+    private EyeProjection eyeProjection(double[][] plane,org.joml.Vector3f normal) {
+        if(localVertices.isEmpty()) return EyeProjection.CLOSED;
+        double[] min={Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY};
+        double[] max={Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY,Double.NEGATIVE_INFINITY};
+        for(var v:localVertices) for(int i=0;i<3;i++) {min[i]=Math.min(min[i],v[i]);max[i]=Math.max(max[i],v[i]);}
+        var view=new Matrix4f(RenderSystem.getModelViewStack().last().pose()).mul(ocularToView);
+        var center=view.transformPosition(new org.joml.Vector3f((float)((min[0]+max[0])*.5),
+                (float)((min[1]+max[1])*.5),(float)((min[2]+max[2])*.5)));
+        double radius;
+        if(plane.length==4) {
+            var a=view.transformPosition(new org.joml.Vector3f((float)plane[0][0],(float)plane[0][1],(float)plane[0][2]));
+            var b=view.transformPosition(new org.joml.Vector3f((float)plane[1][0],(float)plane[1][1],(float)plane[1][2]));
+            var c=view.transformPosition(new org.joml.Vector3f((float)plane[3][0],(float)plane[3][1],(float)plane[3][2]));
+            radius=Math.min(a.distance(b),a.distance(c))*.5;
+        } else {
+            // Non-planar oculars retain the stable local Z axis used above.
+            var x=view.transformDirection(new org.joml.Vector3f((float)((max[0]-min[0])*.5),0,0));
+            var y=view.transformDirection(new org.joml.Vector3f(0,(float)((max[1]-min[1])*.5),0));
+            radius=Math.min(x.length(),y.length());
+        }
+        var pupil=OpticEyeGeometry.pupil(center.x,center.y,center.z,normal.x,normal.y,normal.z,radius);
+        if(!pupil.valid()) return EyeProjection.CLOSED;
+        var projection=RenderSystem.getProjectionMatrix();
+        var c=projection.transform(new Vector4f(center,1));
+        var p=projection.transform(new Vector4f((float)pupil.x(),(float)pupil.y(),(float)pupil.z(),1));
+        if(!Float.isFinite(c.w)||!Float.isFinite(p.w)||c.w<=0||p.w<=0) return EyeProjection.CLOSED;
+        var result=new EyeProjection(c.x/c.w*.5f+.5f,c.y/c.w*.5f+.5f,p.x/p.w*.5f+.5f,p.y/p.w*.5f+.5f,true);
+        return result.finite()?result:EyeProjection.CLOSED;
     }
     @Override public VertexConsumer vertex(double x, double y, double z) {
-        {
-            var local=viewToOcular.transform(new Vector4f((float)x,(float)y,(float)z,1));
-            localVertices.add(new double[]{local.x/local.w,local.y/local.w,local.z/local.w});
-        }
+        viewQuad[vertexIndex*3]=x;viewQuad[vertexIndex*3+1]=y;viewQuad[vertexIndex*3+2]=z;
         Vector4f clip = projection.transform(new Vector4f((float)x, (float)y, (float)z, 1));
-        if (!Float.isFinite(clip.w) || clip.w <= 0) { invalid = true; return this; }
-        double nx = clip.x / clip.w, ny = clip.y / clip.w;
         quad[vertexIndex]=clip;
-        if(division==null) {
-            minX = Math.min(minX, nx); maxX = Math.max(maxX, nx);
-            minY = Math.min(minY, ny); maxY = Math.max(maxY, ny);
-        }
         return this;
     }
     @Override public VertexConsumer color(int r, int g, int b, int a) { return this; }
@@ -131,7 +153,17 @@ public final class EyeBoxMeasure implements VertexConsumer {
     @Override public void endVertex() {
         if(++vertexIndex<4) return;
         vertexIndex=0;
-        for(var p:quad) if(p==null || p.w<=0) { invalid=true; return; }
+        if(!QuadGeometry.hasArea(viewQuad)) return;
+        for(var p:quad) if(p==null || !Float.isFinite(p.w) || p.w<=0) { invalid=true; return; }
+        for(int i=0;i<4;i++) {
+            var local=viewToOcular.transform(new Vector4f((float)viewQuad[i*3],(float)viewQuad[i*3+1],(float)viewQuad[i*3+2],1));
+            localVertices.add(new double[]{local.x/local.w,local.y/local.w,local.z/local.w});
+            if(division==null) {
+                double nx=quad[i].x/quad[i].w,ny=quad[i].y/quad[i].w;
+                minX=Math.min(minX,nx);maxX=Math.max(maxX,nx);
+                minY=Math.min(minY,ny);maxY=Math.max(maxY,ny);
+            }
+        }
         float u0=Float.POSITIVE_INFINITY,v0=u0,u1=Float.NEGATIVE_INFINITY,v1=u1;
         for(int i=0;i<4;i++) { u0=Math.min(u0,uv[i*2]); u1=Math.max(u1,uv[i*2]);
             v0=Math.min(v0,uv[i*2+1]); v1=Math.max(v1,uv[i*2+1]); }

@@ -16,16 +16,13 @@ public final class TaczPipScope {
     public TaczPipScope() {
         net.minecraftforge.fml.ModLoadingContext.get().registerConfig(
                 net.minecraftforge.fml.config.ModConfig.Type.CLIENT, PrototypeConfig.SPEC);
-        LOGGER.info("[TaCZ PiP Scope] Mod loaded successfully");
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::onCommonSetup);
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
-        if (ModList.get().isLoaded("tacz")) {
-            LOGGER.info("[TaCZ PiP Scope] TaCZ detected");
-        } else {
+        if (!ModList.get().isLoaded("tacz")) {
             LOGGER.error("[TaCZ PiP Scope] TaCZ was not detected");
         }
     }

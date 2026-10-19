@@ -2,7 +2,10 @@ package com.shumai.taczpip.client;
 
 /** Projected ocular bounds in bottom-left-origin texture coordinates, never a replacement mask. */
 public record LensBounds(float x, float y, float rx, float ry, float[] outline, boolean alphaShaped, float facing,
-                         float tiltX,float tiltY) {
+                         float tiltX,float tiltY,EyeProjection eye) {
+    public LensBounds(float x,float y,float rx,float ry,float[] outline,boolean alphaShaped,float facing,float tiltX,float tiltY) {
+        this(x,y,rx,ry,outline,alphaShaped,facing,tiltX,tiltY,null);
+    }
     public LensBounds(float x,float y,float rx,float ry,float[] outline,boolean alphaShaped,float facing) {
         this(x,y,rx,ry,outline,alphaShaped,facing,0,0);
     }

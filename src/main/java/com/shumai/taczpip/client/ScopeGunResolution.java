@@ -3,6 +3,7 @@ package com.shumai.taczpip.client;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.shumai.taczpip.PrototypeConfig;
 import net.minecraft.client.Minecraft;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.*;
@@ -17,7 +18,9 @@ public final class ScopeGunResolution {
         var mc = Minecraft.getInstance();
         var main = mc.getMainRenderTarget();
         var shader = ScopeImageShader.gunComposite();
-        if (lens == null || shader == null || (lens.width == main.width && lens.height == main.height)) {
+        float blur=PrototypeConfig.LENS_EFFECTS.get()&&PrototypeConfig.GUN_FOCUS_BLUR.get()
+                ? PrototypeConfig.GUN_BLUR_STRENGTH.get().floatValue() : 0f;
+        if (lens == null || shader == null || (blur<=0 && lens.width == main.width && lens.height == main.height)) {
             long depthStart = RenderMetrics.begin();
             try { LensDepthReset.clear(); }
             finally { RenderMetrics.end(RenderMetrics.BODY_DEPTH, depthStart); }
@@ -70,6 +73,8 @@ public final class ScopeGunResolution {
             RenderSystem.setProjectionMatrix(new Matrix4f(), sorting);
             RenderSystem.setShader(() -> shader);
             RenderSystem.setShaderTexture(0, gunTarget.getColorTextureId());
+            float radius=blur*12f*main.height/1080f;
+            shader.safeGetUniform("GunBlurStep").set(radius/main.width,radius/main.height);
             RenderSystem.enableBlend();
             var buffer = Tesselator.getInstance().getBuilder();
             buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);

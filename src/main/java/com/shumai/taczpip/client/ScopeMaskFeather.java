@@ -43,7 +43,8 @@ public final class ScopeMaskFeather {
                 var b = bounds[i];
                 if (b == null || !b.valid()) continue;
                 var eye=eyes[i];
-                float feather = MaskFeatherRules.width(eye.radius(), Math.min(b.rx()*width, b.ry()*height), eye.visibility(), strength);
+                // The sway gate remains active at full ADS; do not fade its feather away.
+                float feather = MaskFeatherRules.width(eye.radius(), Math.min(b.rx()*width, b.ry()*height), 0, strength);
                 float[] aperture=PupilShape.aperturePlanes(b,width,height);
                 if (feather < .001f && aperture.length==0) continue;
                 shader.safeGetUniform("ApertureEdgeCount").set(aperture.length/4f);

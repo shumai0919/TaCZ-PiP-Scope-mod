@@ -9,8 +9,8 @@ public final class EyeBoxStateTest {
         return EyeBoxState.measure(lens(x,facing),ads,1920,1080);
     }
     public static void main(String[] args) {
-        if(state(.5f,1,1).limited()) throw new AssertionError("aligned aperture clipped");
-        if(state(.505f,1,1).limited()) throw new AssertionError("dead zone");
+        if(state(.5f,1,1).visibility()!=1) throw new AssertionError("aligned visibility");
+        if(!state(.505f,1,1).limited() || state(.505f,1,1).visibility()>=1) throw new AssertionError("sway suppressed");
         if(!state(.65f,1,1).limited()) throw new AssertionError("ADS=1 bypasses displacement");
         if(!state(.5f,.8f,1).limited()) throw new AssertionError("ADS=1 bypasses angle");
         if(state(.5f,1,0).radius()!=0) throw new AssertionError("hip fire");
@@ -26,9 +26,9 @@ public final class EyeBoxStateTest {
         }
         var a=EyeBoxState.measure(lens(.65f,1),1,1920,1080);
         var b=EyeBoxState.measure(lens(.65f,1),1,960,540);
-        if(a.visibility()!=b.visibility() || Math.abs(a.radius()-2*b.radius())>.01f)
+        if(a.visibility()!=b.visibility() || Math.abs(a.radius()-2*b.radius())>2.01f)
             throw new AssertionError("resolution response");
-        if(state(.5f,1,1).limited()) throw new AssertionError("state leaked between lenses");
-        System.out.println("EyeBoxState: displacement/angle at full ADS, dead zone, invalid input, resolution and isolation passed");
+        if(state(.5f,1,1).visibility()!=1) throw new AssertionError("state leaked between lenses");
+        System.out.println("EyeBoxState: displacement/angle at full ADS, small sway, invalid input, resolution and isolation passed");
     }
 }

@@ -16,7 +16,7 @@ public final class ShaderWorldChecks {
     private static long started;
     private static boolean done;
     @SubscribeEvent public static void frame(TickEvent.RenderTickEvent event) {
-        if (!Boolean.getBoolean("taczpip.shaderWorldChecks") || done || event.phase != TickEvent.Phase.END) return;
+        if (net.minecraftforge.fml.loading.FMLEnvironment.production || !Boolean.getBoolean("taczpip.shaderWorldChecks") || done || event.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.screen != null) return;
         if (started == 0) started = System.nanoTime();

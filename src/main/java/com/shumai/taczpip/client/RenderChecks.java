@@ -14,6 +14,7 @@ public final class RenderChecks {
         if (!condition) throw new IllegalStateException("PiP render check failed: " + message);
     }
     public static void run() {
+        if (net.minecraftforge.fml.loading.FMLEnvironment.production) return;
         RenderSystem.assertOnRenderThread();
         MixinEnvironment.getCurrentEnvironment().audit();
         checkEmbeddiumTerrainReuse();

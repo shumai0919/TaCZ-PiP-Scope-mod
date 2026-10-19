@@ -4,4 +4,5 @@ package com.shumai.taczpip.client;
 public interface OpticalModel {
     boolean taczpip$hasOpticalLens();
     boolean taczpip$isOpticalView(int view);
+    default boolean taczpip$nativeHud() { return false; }
 }
