@@ -2,7 +2,8 @@
   "required": true,
   "minVersion": "0.8",
   "package": "com.shumai.taczpip.mixin",
+  "plugin": "com.shumai.taczpip.compat.PipMixinPlugin",
   "compatibilityLevel": "JAVA_17",
-  "client": ["ConfiguredOrderMixin", "CubeVertexReuseMixin", "BedrockModelProfileMixin", "BedrockAttachmentModelMixin", "CameraSetupEventMixin", "FirstPersonPositionMixin", "BedrockGunModelMixin", "EmbeddiumWorldRendererMixin", "ShaderWorldStartMixin", "OculusHandMixin", "OculusChunkProgramsMixin", "OculusPipelineLifecycleMixin", "OculusFinalCompositeMixin", "DhStencilPreparationMixin", "ScopeEntityFilterMixin", "ScopeBlockEntityFilterMixin", "ScopeParticleFilterMixin", "ScopeWindowSizeMixin", "DhScopeBuffersMixin", "GpuShiftScopeEntityMixin", "GpuShiftScopeBudgetMixin"],
+  "client": ["ConfiguredOrderMixin", "CubeVertexReuseMixin", "BedrockModelProfileMixin", "BedrockAttachmentModelMixin", "CameraSetupEventMixin", "FirstPersonPositionMixin", "BedrockGunModelMixin", "EmbeddiumWorldRendererMixin", "ShaderWorldStartMixin", "OculusHandMixin", "OculusChunkProgramsMixin", "OculusPipelineLifecycleMixin", "OculusFinalCompositeMixin", "DhStencilPreparationMixin", "ScopeEntityFilterMixin", "ScopeBlockEntityFilterMixin", "ScopeParticleFilterMixin", "ScopeWindowSizeMixin", "DhScopeBuffersMixin", "DhModernTaaMixin", "DhModernTaaSeedMixin", "DhModernJitterMixin", "GpuShiftScopeEntityMixin", "GpuShiftScopeBudgetMixin"],
   "injectors": {"defaultRequire": 1}
 }

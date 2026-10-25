@@ -9,7 +9,7 @@ version = mod_version
 group = mod_group_id
 
 base {
-    archivesName = 'tacz-pip-scope'
+    archivesName = 'tacz-enhanced-pip-scopes'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -21,7 +21,9 @@ minecraft {
 
     runs {
         configureEach {
-            workingDirectory project.file('run')
+            // Compatibility checks can use an isolated directory without
+            // touching the usual development world's settings or saves.
+            workingDirectory project.file(project.findProperty('pipRunDir') ?: 'run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
             // TaCZ ships an obfuscated refmap. Remap it to the Parchment names
@@ -31,6 +33,10 @@ minecraft {
             args '--mixin', 'tacz_pip_scope.mixins.json'
             if (project.hasProperty('pipRenderChecks')) {
                 property 'taczpip.renderChecks', 'true'
+            }
+            if (project.hasProperty('pipMenuSmoke')) {
+                property 'taczpip.renderChecks', 'true'
+                property 'taczpip.menuSmoke', 'true'
             }
             if (project.hasProperty('pipShaderWorldChecks')) {
                 property 'taczpip.shaderWorldChecks', 'true'

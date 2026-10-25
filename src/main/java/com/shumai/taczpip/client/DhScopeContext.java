@@ -1,14 +1,18 @@
 package com.shumai.taczpip.client;
 
 import net.minecraftforge.fml.ModList;
+import com.shumai.taczpip.compat.DhAbi;
+import com.shumai.taczpip.compat.DhVersionRules;
+import com.shumai.taczpip.compat.PipMixinPlugin;
 import java.lang.reflect.*;
 import java.util.*;
 
-/** DH 2.2.1-a: retain normal DH render hooks, isolate per-view shared state. */
+/** Version-specific DH state isolation with a shared Oculus override bridge. */
 public final class DhScopeContext implements AutoCloseable {
     private final List<Runnable> restore = new ArrayList<>();
     private static final Map<String, Field> fields = new HashMap<>();
     private static DhScopeContext active;
+    private static boolean warnedUnsupported;
     private final Set<Object> swapped = Collections.newSetFromMap(new IdentityHashMap<>());
     public static void prepareBuffers(Object renderer) {
         if (active != null && active.swapped.add(renderer))
@@ -16,21 +20,37 @@ public final class DhScopeContext implements AutoCloseable {
     }
     public static boolean loaded() { return ModList.get().isLoaded("distanthorizons"); }
     public static boolean supported() {
-        return !loaded() || ModList.get().getModContainerById("distanthorizons")
-                .map(m -> "2.2.1-a".equals(m.getModInfo().getVersion().toString())).orElse(false);
+        boolean supported = !loaded() || ModList.get().getModContainerById("distanthorizons")
+                .map(m -> {
+                    String version = m.getModInfo().getVersion().toString();
+                    return DhVersionRules.legacy(version) && PipMixinPlugin.dhKind() == DhAbi.Kind.LEGACY
+                            || DhVersionRules.modern(version) && PipMixinPlugin.dhKind() == DhAbi.Kind.MODERN;
+                }).orElse(false);
+        if (!supported && !warnedUnsupported) {
+            warnedUnsupported = true;
+            com.mojang.logging.LogUtils.getLogger().warn(
+                    "[TaCZ Enhanced PiP Scopes] DH version/layout not supported (layout={}); PiP disabled. Expected 2.2.1-a or 3.3.0+ release with compatible OpenGL internals.",
+                    PipMixinPlugin.dhKind());
+        }
+        return supported;
     }
     public static DhScopeContext enter() {
         if (!loaded()) return null;
         if (!supported()) throw new IllegalStateException("Unsupported DH version");
+        if (active != null) throw new IllegalStateException("Nested DH scope");
         DhScopeContext context = new DhScopeContext();
         try {
-            String api = "com.seibel.distanthorizons.core.api.internal.ClientApi";
-            context.capture(api, singleton(api), "renderingCancelledForThisFrame");
+            if (PipMixinPlugin.dhKind() == DhAbi.Kind.MODERN) {
+                DhModernState.enter(context.restore);
+            } else {
+                String api = "com.seibel.distanthorizons.core.api.internal.ClientApi";
+                context.capture(api, singleton(api), "renderingCancelledForThisFrame");
+                String renderer = "com.seibel.distanthorizons.core.render.renderer.LodRenderer";
+                for (String name : new String[]{"activeFramebufferId", "activeColorTextureId", "activeDepthTextureId"})
+                    context.capture(renderer, null, name);
+            }
             String proxy = "com.seibel.distanthorizons.core.render.DhApiRenderProxy";
             context.capture(proxy, singleton(proxy), "deferTransparentRendering");
-            String renderer = "com.seibel.distanthorizons.core.render.renderer.LodRenderer";
-            for (String name : new String[]{"activeFramebufferId", "activeColorTextureId", "activeDepthTextureId"})
-                context.capture(renderer, null, name);
             if (OculusCompat.shadersActive()) {
                 context.capture("net.irisshaders.iris.compat.dh.LodRendererEvents", null, "atTranslucent");
                 context.capture("net.irisshaders.iris.compat.dh.LodRendererEvents", null, "textureWidth");

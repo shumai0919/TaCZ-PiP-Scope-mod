@@ -111,7 +111,7 @@ public final class ReticleTexture {
             OPENINGS.put(key,openings);
             return Optional.of(id);
         } catch(Exception ex) {
-            com.mojang.logging.LogUtils.getLogger().warn("[TaCZ PiP Scope] Reticle separation skipped: {}",key.texture,ex);
+            com.mojang.logging.LogUtils.getLogger().warn("[TaCZ Enhanced PiP Scopes] Reticle separation skipped: {}",key.texture,ex);
             return Optional.empty();
         } finally {if(image!=null) image.close();}
     }

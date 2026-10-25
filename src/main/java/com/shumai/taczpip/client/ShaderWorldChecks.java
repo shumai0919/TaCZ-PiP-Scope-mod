@@ -43,7 +43,7 @@ public final class ShaderWorldChecks {
         if (Boolean.getBoolean("taczpip.shaderAdsChecks") && frames == 60) {
             com.tacz.guns.client.input.AimKey.AIM_KEY.setDown(true);
             com.tacz.guns.api.client.gameplay.IClientPlayerGunOperator.fromLocalPlayer(mc.player).aim(true);
-            LogUtils.getLogger().info("[TaCZ PiP Scope] Test ADS started: {}", mc.player.getMainHandItem().getTag());
+            LogUtils.getLogger().info("[TaCZ Enhanced PiP Scopes] Test ADS started: {}", mc.player.getMainHandItem().getTag());
         }
         if (frames < 120 || System.nanoTime() - started < 15_000_000_000L) return;
         done = true;
@@ -63,9 +63,9 @@ public final class ShaderWorldChecks {
             try (var image = Screenshot.takeScreenshot(ScopeFramebufferPrototype.lensTarget())) {
                 image.writeToFile(folder.resolve("shader-scope-check.png"));
             }
-            LogUtils.getLogger().info("[TaCZ PiP Scope] Shader world checks PASSED: {} frames, target available; images saved for visual review", frames);
+            LogUtils.getLogger().info("[TaCZ Enhanced PiP Scopes] Shader world checks PASSED: {} frames, target available; images saved for visual review", frames);
         } catch (Exception error) {
-            LogUtils.getLogger().error("[TaCZ PiP Scope] Shader world checks FAILED", error);
+            LogUtils.getLogger().error("[TaCZ Enhanced PiP Scopes] Shader world checks FAILED", error);
         }
         mc.stop();
     }

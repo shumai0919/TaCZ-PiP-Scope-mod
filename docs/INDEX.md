@@ -2,7 +2,10 @@
 
 ## 現行仕様
 
+- [配布前の次作業・互換要件の調査](RELEASE_TODO.md)
+- [DH互換処理・版別の確認手順](DH_COMPATIBILITY.md)
 - [通常使用向け表面表現](SURFACE_NORMAL_USE.md)
+- [傷・汚れの現行設定と適用条件](SURFACE_SETTINGS.md)
 - [保存した初期値](TUNED_DEFAULTS.md)
 - [HUD照準のフォールバック](HUD_OPTIC_FALLBACK.md)
 - [配布前の確認](../TESTING.md)

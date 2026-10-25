@@ -114,7 +114,7 @@ public final class ScopeFramebufferPrototype {
         }
         if (!compatibleRenderer()) {
             if (!warned) {
-                LogUtils.getLogger().warn("[TaCZ PiP Scope] Unsupported renderer combination. Requires Fast/Fancy, Embeddium 0.3.31, Oculus 1.8.0, DH 2.2.1-a when installed; AcceleratedRendering remains unsupported.");
+                LogUtils.getLogger().warn("[TaCZ Enhanced PiP Scopes] Unsupported renderer combination. Requires Fast/Fancy, Embeddium 0.3.31, Oculus 1.8.0, DH 2.2.1-a or compatible 3.3.0+ when installed; AcceleratedRendering remains unsupported.");
                 warned = true;
             }
             resetZoom();
@@ -151,6 +151,7 @@ public final class ScopeFramebufferPrototype {
                 + ":" + PrototypeConfig.PIP_MAX_FPS.get() + ":" + PrototypeConfig.PIP_ENTITIES.get()
                 + ":" + PrototypeConfig.PIP_BLOCK_ENTITIES.get() + ":" + PrototypeConfig.PIP_PARTICLES.get();
         if (!settings.equals(cacheSettings) || cacheLevel != mc.level) cached = false;
+        if (cacheLevel != mc.level) DhTemporalState.invalidate();
         cacheSettings = settings;
         cacheLevel = mc.level;
         long now = System.nanoTime();
@@ -164,10 +165,19 @@ public final class ScopeFramebufferPrototype {
         var sorting = RenderSystem.getVertexSorting();
         Matrix3f inverseView = new Matrix3f(RenderSystem.getInverseViewRotationMatrix());
         PostChain outlines = mc.levelRenderer.entityEffect;
+        // DH 3.3's shader-off pass uses reverse Z and sets glClearDepth(0).
+        // Its GLState restores the depth function, but not the clear value.
+        // GameRenderer clears depth again before drawing the hand: leaking zero
+        // rejects the gun on PiP-update frames (cached-image frames are unaffected).
+        // Capture before TextureTarget allocation/resize, which can also change it.
+        double depthClearValue = org.lwjgl.opengl.GL11.glGetDouble(org.lwjgl.opengl.GL11.GL_DEPTH_CLEAR_VALUE);
         // Preserve the main view's wider frustum/chunk visibility list: only the
         // projection narrows. Extra culling work is preferable to missing chunks.
         Matrix4f scopeProjection = new Matrix4f().scaling(magnification, magnification, 1)
                 .mul(worldProjection);
+        // DH's own AA setting controls TAA; shader packs retain their own AA path.
+        DhTemporalState.prepare(!shaderPass,
+                context + ":" + settings + ":" + scopeProjection.m00() + ":" + scopeProjection.m11(), now);
         rendering = true;
         long metricStart = RenderMetrics.begin();
         GpuRenderMetrics.beginWorld();
@@ -206,8 +216,9 @@ public final class ScopeFramebufferPrototype {
             lastWorldTime = now;
         } catch (RuntimeException exception) {
             failed = true;
-            LogUtils.getLogger().error("[TaCZ PiP Scope] PiP disabled until reconnect after render failure", exception);
+            LogUtils.getLogger().error("[TaCZ Enhanced PiP Scopes] PiP disabled until reconnect after render failure", exception);
         } finally {
+            RenderSystem.clearDepth(depthClearValue);
             mc.mainRenderTarget = main;
             mc.levelRenderer.entityEffect = outlines;
             main.bindWrite(true);
@@ -249,13 +260,14 @@ public final class ScopeFramebufferPrototype {
         buffer.vertex(matrix, x, y, 0).uv(0, 1).endVertex();
         BufferUploader.drawWithShader(buffer.end());
         RenderSystem.enableDepthTest();
-        gui.drawString(mc.font, String.format(Locale.ROOT, "PiP Phase 5 | %.2fx", magnification), x, 8, 0xffffff);
+        gui.drawString(mc.font, String.format(Locale.ROOT, "PiP Preview | %.2fx", magnification), x, 8, 0xffffff);
     }
 
     @SubscribeEvent
     public static void disconnect(ClientPlayerNetworkEvent.LoggingOut event) {
         ShaderScopeContext.release();
-        DhScopeBuffers.releaseAll();
+        try { DhScopeBuffers.releaseAll(); }
+        finally { DhModernState.releaseAll(); }
         ScopeGunResolution.release();
         ScopeLensComposite.clearReticle();
         resetZoom();
@@ -273,6 +285,7 @@ public final class ScopeFramebufferPrototype {
     }
 
     private static void resetZoom() {
+        DhTemporalState.invalidate();
         invalidateFrame();
         ZOOM_TRANSITION.reset();
         zoomContext = null;

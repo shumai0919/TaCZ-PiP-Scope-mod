@@ -33,7 +33,7 @@ public final class OculusCompat {
             return true;
         } catch (ReflectiveOperationException | LinkageError error) {
             unavailable = true;
-            LogUtils.getLogger().warn("[TaCZ PiP Scope] Oculus API unavailable; PiP remains disabled", error);
+            LogUtils.getLogger().warn("[TaCZ Enhanced PiP Scopes] Oculus API unavailable; PiP remains disabled", error);
             return false;
         }
     }

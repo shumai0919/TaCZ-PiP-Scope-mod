@@ -41,7 +41,7 @@ public final class RenderChecks {
             require(GL11.glIsEnabled(GL11.GL_DEPTH_TEST), "previous depth enable must be restored");
             require(GL11.glGetBoolean(GL11.GL_DEPTH_WRITEMASK), "previous depth write must be restored");
             require(GL11.glGetInteger(GL11.GL_DEPTH_FUNC) == GL11.GL_LEQUAL, "previous depth function must be restored");
-            LogUtils.getLogger().info("[TaCZ PiP Scope] Render checks PASSED: Mixin audit, original depth bug reproduced, reticle draw state and restoration verified");
+            LogUtils.getLogger().info("[TaCZ Enhanced PiP Scopes] Render checks PASSED: Mixin audit, original depth bug reproduced, reticle draw state and restoration verified");
         } finally {
             RenderSystem.depthFunc(func);
             RenderSystem.depthMask(write);
@@ -79,7 +79,7 @@ public final class RenderChecks {
                     != net.minecraft.client.GraphicsStatus.FABULOUS) {
                 require(ScopeFramebufferPrototype.compatibleRenderer(), "Embeddium Rubidium stub must be allowed");
             }
-            LogUtils.getLogger().info("[TaCZ PiP Scope] Embeddium terrain reuse checks PASSED (menu-only injection check, not world visual validation)");
+            LogUtils.getLogger().info("[TaCZ Enhanced PiP Scopes] Embeddium terrain reuse checks PASSED (menu-only injection check, not world visual validation)");
         } catch (ReflectiveOperationException error) {
             throw new IllegalStateException("Embeddium terrain reuse check failed", error);
         }
@@ -104,6 +104,6 @@ public final class RenderChecks {
         try { ReticleBackgroundFilter.render(root, () -> { throw expected; }); }
         catch (RuntimeException error) { if (error != expected) throw error; }
         require(bg.visible, "background must be restored even on failure");
-        LogUtils.getLogger().info("[TaCZ PiP Scope] Reticle background checks PASSED");
+        LogUtils.getLogger().info("[TaCZ Enhanced PiP Scopes] Reticle background checks PASSED");
     }
 }

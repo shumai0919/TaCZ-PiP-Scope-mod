@@ -2,10 +2,10 @@
 
 ## 導入
 
-1. Minecraft 1.20.1 / Forge 47.4.20 / Java 17のテスト用インスタンスを用意する。
+1. Minecraft 1.20.1 / Forge 47.4.10 / Java 17のテスト用インスタンスを用意する。普段の47.4.20環境は残し、コピーしたテスト環境で最低対応版を確認する。
 2. TaCZ 1.1.8-hotfix2と、使うパックに必要な依存MODを導入する。
 3. Minecraft終了後、旧PiP JARをmods外へバックアップし、新JARをmodsへ置く。重複させない。
-4. Mods画面でTaCZ PiP Scopeを確認する。成功ログの出力は不要として削除済み。
+4. Mods画面でTaCZ Enhanced PiP Scopes、バージョン0.1.0、作者shumoiを確認する。成功ログの出力は不要として削除済み。
 
 設定は `config/tacz_pip_scope-client.toml`。Configuredがあれば設定画面から編集可能です。まず最小構成、その後シェーダー・軽量化MODとの組み合わせを確認します。
 
@@ -25,6 +25,7 @@
 ## 自動・コード検証
 
 - `./gradlew build`
+- `./gradlew runClient -PpipMenuSmoke -PpipRunDir=work/forge-47410-menu-smoke` — 専用ディレクトリでタイトル画面120フレーム・シェーダー読み込み・Mixin監査後に自動終了。初回のアクセシビリティ案内はContinueで進める。ワールドは開かず、ADS確認の代わりにはならない。配布環境ではこの自動終了処理は無効。
 - `./tools/Test-LensSurface.ps1`
 - `./tools/Test-ConfiguredComments.ps1`
 - `./tools/Test-SurfaceVariants.ps1`
@@ -32,6 +33,8 @@
 - toolsのJava単体テストはjavac/javaで別途実行。CompileVisualShadersは非表示OpenGLコンテキストでのコンパイル・リンク検証であり、実ゲームの表示テストではない。
 
 旧試作のテスト・資料には過去の仕様の記録も含まれます。描画検証用の自動ワールド操作は配布環境で無効です。CPU/GPU計測は通常版で無効です。
+
+2026-10-20: Forge 47.4.10＋TaCZ 1.1.8-hotfix2、任意MODなしで上記ビルドと開発クライアントのメニュー検証に成功。通常終了を確認。未導入の任意MODに対するMixinクラス未検出警告と開発用Realms認証通知は残るが、起動を阻害しなかった。配布JARでのワールド内表示、ADS、Oculus・DH等との併用はユーザー確認待ち。
 
 ## 不具合報告
 

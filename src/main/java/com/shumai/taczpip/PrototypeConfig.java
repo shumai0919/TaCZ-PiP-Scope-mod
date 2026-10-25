@@ -91,20 +91,22 @@ public final class PrototypeConfig {
         LENS_GHOST = builder.translation("tacz_pip_scope.config.lensGhost").define("lensGhost", true);
         GHOST_STRENGTH = builder.comment("Approximate bright-scene ghost strength; zero disables it.")
                 .translation("tacz_pip_scope.config.ghostStrength").defineInRange("ghostStrength", 0.1, 0.0, 1.0);
-        SURFACE_TEXTURE = builder.translation("tacz_pip_scope.config.surfaceTexture").define("surfaceTexture", true);
-        SURFACE_TEXTURE_TYPE = builder.comment("Surface image: 0 original, 1 fine wear, 2 wiping marks, 3 smudges.")
+        // Keep paths/defaults stable: the procedural fallback is still used, not obsolete.
+        SURFACE_TEXTURE = builder.comment("ON: image mode for dirt/scratches. OFF: procedural mode, not effects disabled.")
+                .translation("tacz_pip_scope.config.surfaceTexture").define("surfaceTexture", true);
+        SURFACE_TEXTURE_TYPE = builder.comment("Image mode only, shared by dirt/scratches: 0 original, 1 fine wear, 2 wiping marks, 3 smudges.")
                 .translation("tacz_pip_scope.config.surfaceTextureType").defineInRange("surfaceTextureType", 2, 0, 3);
-        SURFACE_PATTERN = builder.comment("Shared dirt and scratch pattern number. Zero preserves the original pattern.")
+        SURFACE_PATTERN = builder.comment("Both modes: shared dirt/scratch pattern number. Rotates/shifts the image or changes procedural placement; does not select the image type.")
                 .translation("tacz_pip_scope.config.surfacePattern").defineInRange("surfacePattern", 6, 0, 9999);
         LENS_DIRT = builder.translation("tacz_pip_scope.config.lensDirt").define("lensDirt", true);
-        DIRT_STRENGTH = builder.comment("Subtle lens surface smudges; zero disables them.")
+        DIRT_STRENGTH = builder.comment("Both modes: darkening from dirt, independent of scratch opacity. Zero disables dirt.")
                 .translation("tacz_pip_scope.config.dirtStrength").defineInRange("dirtStrength", 0.12, 0.0, 1.0);
         LENS_SCRATCHES = builder.translation("tacz_pip_scope.config.lensScratches").define("lensScratches", true);
-        SCRATCH_STRENGTH = builder.comment("Fine lens surface scratches; zero disables them.")
+        SCRATCH_STRENGTH = builder.comment("Both modes: scratch visibility, not count or placement. Zero disables scratches.")
                 .translation("tacz_pip_scope.config.scratchStrength").defineInRange("scratchStrength", 0.6, 0.0, 1.0);
         SCRATCH_DENSITY = builder.comment("Procedural-only scratch count multiplier; ignored with surface texture enabled. Zero disables procedural scratches.")
                 .translation("tacz_pip_scope.config.scratchDensity").defineInRange("scratchDensity", 4.0, 0.0, 4.0);
-        SCRATCH_SIZE = builder.comment("Scratch length and width multiplier; zero disables scratches.")
+        SCRATCH_SIZE = builder.comment("Both modes: scratch image scale (may crop edges) or procedural line length/width. Does not scale dirt. Zero disables scratches.")
                 .translation("tacz_pip_scope.config.scratchSize").defineInRange("scratchSize", 1.4, 0.0, 4.0);
 
         // Focus and non-ADS. Preserve existing config paths and saved values.

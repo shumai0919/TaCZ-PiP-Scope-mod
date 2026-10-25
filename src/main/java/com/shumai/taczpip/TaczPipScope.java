@@ -23,7 +23,7 @@ public final class TaczPipScope {
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {
         if (!ModList.get().isLoaded("tacz")) {
-            LOGGER.error("[TaCZ PiP Scope] TaCZ was not detected");
+            LOGGER.error("[TaCZ Enhanced PiP Scopes] TaCZ was not detected");
         }
     }
 }
