@@ -2,6 +2,14 @@
 
 TaCZ向けPicture-in-Pictureスコープアドオン（Forge 1.20.1）。通常の画面と別に拡大映像を描画し、スコープの開口内に合成します。作者：shumoi。バージョン：0.1.0。
 
+## 配布・ソースコード
+
+- [CurseForge プロジェクトページ](https://www.curseforge.com/minecraft/mc-mods/tacz-enhanced-pip-scopes)
+- [0.1.0 配布JAR（CurseForge）](https://www.curseforge.com/minecraft/mc-mods/tacz-enhanced-pip-scopes/files/9322304)
+- [0.1.0 ソースコード（GitHub Release）](https://github.com/shumai0919/TaCZ-PiP-Scope-mod/releases/tag/v0.1.0)
+
+ゲームに導入するJARはCurseForgeからダウンロードしてください。GitHub Releaseの「Source code (zip)」「Source code (tar.gz)」は、そのバージョンのソースコードです。MODとしてそのまま導入することはできません。
+
 ## 導入
 
 必要環境はMinecraft 1.20.1、Forge 47.4.10以上、Java 17、TaCZ 1.1.8-hotfix2以上です。Forge 47.4.10をビルド基準にし、同版＋TaCZ 1.1.8-hotfix2の最小構成で開発クライアントの起動検証に成功しています。47.4.10はユーザーからも問題なしの報告を受けています（全構成の保証ではありません）。従来の実画面確認環境はForge 47.4.20です。Minecraftを終了し、本MODのJARをmodsに配置してください。同じMODの旧JARとの重複は避けてください。ガンパック固有の依存MODは別途必要です。
@@ -34,4 +42,4 @@ Java 17で `./gradlew build`。リリース用成果物は `build/libs/tacz-enha
 
 [導入後の検証](TESTING.md)／[資料一覧](docs/INDEX.md)。Gradle buildだけではtoolsの手動テストや実ゲーム表示を検証しません。通常動作の成功・描画開始ログは出さず、警告とエラーを残します。
 
-外部MOD・ガンパック・ワールド・録画・試験JAR・開発キャッシュはGitに含めません。表面画像は組み込み画像生成で作成し、生成記録をdocsに保存しています。メタデータのライセンスは現在All Rights Reservedです。公開ライセンスの変更やGitHub Release作成は別途決定してください。
+外部MOD・ガンパック・ワールド・録画・試験JAR・開発キャッシュはGitに含めません。表面画像は組み込み画像生成で作成し、生成記録をdocsに保存しています。ライセンスはAll Rights Reservedです。
